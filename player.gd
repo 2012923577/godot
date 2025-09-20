@@ -32,10 +32,13 @@ const AIR_ACCELERATION:=RUN_SPEED/0.2
 const JUMP_VELOCITY:=-420
 const  WALL_JUMP_VELOCITY:=Vector2(500,-320)
 var is_first_tick:=false
-var last_attack:=0
-
-	
+@export var last_attack:=0
 @export var can_combo:=false
+
+func _ready():
+	attack_late_timer.timeout.connect(_on_attack_late_timeout)
+func _on_attack_late_timeout():
+	last_attack = 0
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("jump"):
@@ -49,8 +52,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func tick_physics(state:State,delta: float) -> void:
 	var direction:=Input.get_axis("move_left","move_right")
-	if attack_late_timer.time_left==0.01:
-		last_attack=0
 	match state:
 		State.IDLE:
 			move(default_gravity,delta)
@@ -227,3 +228,4 @@ func transition_state(from: State,to: State)->void:
 			attack_request_timer.stop()
 			last_attack=0
 	is_first_tick=true
+
